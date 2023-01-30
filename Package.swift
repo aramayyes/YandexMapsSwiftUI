@@ -33,6 +33,9 @@ let package = Package(
       name: "YandexMapsSwiftUI",
       dependencies: [
         .product(name: "YandexMapsMobile", package: "YandexMapsMobileLite"),
+      ],
+      resources: [
+        .process("Resources"),
       ]
     ),
   ]

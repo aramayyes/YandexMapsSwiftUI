@@ -374,9 +374,16 @@ public extension YandexMap {
     }
 
     public func onObjectAdded(with view: YMKUserLocationView) {
-      let image = UIImage(
-        systemName: "circle.inset.filled"
-      )!
+      let image: UIImage
+      if let path = Bundle.module.path(forResource: "circle", ofType: "png"),
+         let uiImage = UIImage(contentsOfFile: path)
+      {
+        image = uiImage
+      } else {
+        image = UIImage(
+          systemName: "circle.inset.filled"
+        )!
+      }
 
       let style = YMKIconStyle(
         anchor: CGPoint(x: 0.5, y: 0.5) as NSValue,
