@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "YandexMapsMobileLite",
+        "repositoryURL": "https://github.com/c-villain/YandexMapsMobileLite",
+        "state": {
+          "branch": null,
+          "revision": "a3220da074bfca3eb7cd2a940627c818b71e9505",
+          "version": "4.2.2"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
