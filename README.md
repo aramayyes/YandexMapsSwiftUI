@@ -24,7 +24,7 @@ Setup
 -----
 1. Add `import YandexMapsMobile` to your `AppDelegate`
 2. Set your API key in the `application:didFinishLaunchingWithOptions` method of the application delegate and instantiate the YMKMapKit object:
-```
+```swift
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
     YMKMapKit.setApiKey("Your API key")
     YMKMapKit.sharedInstance()
@@ -201,6 +201,19 @@ extension UIView {
     let image = UIGraphicsGetImageFromCurrentImageContext()!
     UIGraphicsEndImageContext()
     return image
+  }
+}
+
+// Then: 
+struct YourPlacemarkModel: YandexMapPlacemark {
+  ...
+
+  var iamge: UIImage {
+    YourCustomSwiftUIView(
+      typeCode: typeCode,
+      isSelected: false
+    )
+    .snapshot()
   }
 }
 ```
