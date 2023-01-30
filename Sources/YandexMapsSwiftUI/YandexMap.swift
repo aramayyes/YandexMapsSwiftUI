@@ -391,7 +391,7 @@ public extension YandexMap {
         zIndex: 0,
         flat: true,
         visible: true,
-        scale: 1.2,
+        scale: 1,
         tappableArea: nil
       )
 
