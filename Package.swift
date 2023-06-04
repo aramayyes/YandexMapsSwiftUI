@@ -19,10 +19,6 @@ let package = Package(
   ],
   dependencies: [
     // Dependencies declare other packages that this package depends on.
-    .package(
-      url: "https://github.com/c-villain/YandexMapsMobileLite",
-      from: "4.2.2"
-    ),
   ],
   targets: [
     // Targets are the basic building blocks of a package. A target can define a
@@ -32,11 +28,16 @@ let package = Package(
     .target(
       name: "YandexMapsSwiftUI",
       dependencies: [
-        .product(name: "YandexMapsMobile", package: "YandexMapsMobileLite"),
+        "YandexMapsMobile",
       ],
       resources: [
         .process("Resources"),
       ]
+    ),
+    .binaryTarget(
+      name: "YandexMapsMobile",
+      url: "https://github.com/c-villain/YandexMapsMobileLite/releases/download/4.3.1/YandexMapsMobile.xcframework.zip",
+      checksum: "9bfb13051437f525b8cce99c96dc362af6e070a1fec3a8db966d33305b896529"
     ),
   ]
 )
