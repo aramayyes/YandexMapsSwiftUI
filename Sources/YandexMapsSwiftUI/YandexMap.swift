@@ -1,4 +1,3 @@
-import MapKit
 import SwiftUI
 import UIKit
 import YandexMapsMobile
@@ -11,6 +10,8 @@ public struct YandexMap<Placemark: YandexMapPlacemark>: UIViewRepresentable {
   ) -> YMKPlacemarkMapObject
 
   private typealias PlacemarkRemover = (_: YMKMapObject) -> Void
+
+  @Environment(\.colorScheme) var colorScheme
 
   @Binding public var position: YandexMapCameraPosition
   public let placemarks: [Placemark]
@@ -44,6 +45,7 @@ extension YandexMap {
     // Create a map view.
     let mapView = YMKMapView()
     mapView.mapWindow.map.addCameraListener(with: context.coordinator)
+    mapView.mapWindow.map.isNightModeEnabled = colorScheme == .dark
 
     // Setup the map view.
     makeUserLocationLayer(mapView: mapView, context: context)
@@ -103,11 +105,19 @@ extension YandexMap {
 
 extension YandexMap {
   public func updateUIView(_ uiView: YMKMapView, context: Context) {
+    updateColorScheme(uiView: uiView)
     updateCameraPosition(uiView: uiView)
     updatePlacemarks(uiView, context: context)
 
     // Save current view state.
     context.coordinator.view = self
+  }
+
+  private func updateColorScheme(uiView: YMKMapView) {
+    let isDark = colorScheme == .dark
+    if uiView.mapWindow.map.isNightModeEnabled != isDark {
+      uiView.mapWindow.map.isNightModeEnabled = isDark
+    }
   }
 
   private func updateCameraPosition(uiView: YMKMapView) {
