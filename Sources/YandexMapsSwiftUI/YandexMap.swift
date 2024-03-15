@@ -38,7 +38,7 @@ public struct YandexMap<Placemark: YandexMapPlacemark>: UIViewRepresentable {
   }
 }
 
-// MARK: - Make UIView.
+// MARK: - Make UIView
 
 extension YandexMap {
   public func makeUIView(context: Context) -> YMKMapView {
@@ -75,7 +75,13 @@ extension YandexMap {
       for placemark in placemarks {
         context.coordinator.placemarkObjects[placemark.id] = createPlacemark(
           placemark,
-          placemarkAdder: collection.addPlacemark(with:image:style:),
+          placemarkAdder: { point, image, style in
+            let placemark = collection.addPlacemark()
+            placemark.geometry = point
+            placemark.setIconWith(image, style: style)
+
+            return placemark
+          },
           listener: context.coordinator
         )
       }
@@ -92,8 +98,13 @@ extension YandexMap {
       for placemark in placemarks {
         context.coordinator.placemarkObjects[placemark.id] = createPlacemark(
           placemark,
-          placemarkAdder: mapView.mapWindow.map.mapObjects
-            .addPlacemark(with:image:style:),
+          placemarkAdder: { point, image, style in
+            let placemark = mapView.mapWindow.map.mapObjects.addPlacemark()
+            placemark.geometry = point
+            placemark.setIconWith(image, style: style)
+
+            return placemark
+          },
           listener: context.coordinator
         )
       }
@@ -101,7 +112,7 @@ extension YandexMap {
   }
 }
 
-// MARK: - Update UIView.
+// MARK: - Update UIView
 
 extension YandexMap {
   public func updateUIView(_ uiView: YMKMapView, context: Context) {
@@ -129,7 +140,7 @@ extension YandexMap {
     if currentCameraPosition != position {
       uiView.mapWindow.map.move(
         with: position.toYMKCameraPosition(),
-        animationType: YMKAnimation(
+        animation: YMKAnimation(
           type: YMKAnimationType.smooth,
           duration: cameraAnimationDuration
         )
@@ -165,7 +176,7 @@ extension YandexMap {
   }
 }
 
-// MARK: - Helpers.
+// MARK: - Helpers
 
 extension YandexMap {
   private func createPlacemark(
@@ -204,7 +215,13 @@ extension YandexMap {
     for placemark in placemarks {
       context.coordinator.placemarkObjects[placemark.id] = createPlacemark(
         placemark,
-        placemarkAdder: collection.addPlacemark(with:image:style:),
+        placemarkAdder: { point, image, style in
+          let placemark = collection.addPlacemark()
+          placemark.geometry = point
+          placemark.setIconWith(image, style: style)
+
+          return placemark
+        },
         listener: context.coordinator
       )
     }
@@ -234,8 +251,13 @@ extension YandexMap {
     for placemark in placemarks {
       context.coordinator.placemarkObjects[placemark.id] = createPlacemark(
         placemark,
-        placemarkAdder: uiView.mapWindow.map.mapObjects
-          .addPlacemark(with:image:style:),
+        placemarkAdder: { point, image, style in
+          let placemark = uiView.mapWindow.map.mapObjects.addPlacemark()
+          placemark.geometry = point
+          placemark.setIconWith(image, style: style)
+
+          return placemark
+        },
         listener: context.coordinator
       )
     }
@@ -245,14 +267,26 @@ extension YandexMap {
     uiView: YMKMapView,
     context: Context
   ) {
-    let placemarkAdder: PlacemarkAdder = context
+    let placemarkAdder: PlacemarkAdder = if let collection = context
       .coordinator
-      .clusterizedPlacemarkCollection?
-      .addPlacemark(with:image:style:)
-      ??
-      uiView
-      .mapWindow.map.mapObjects
-      .addPlacemark(with:image:style:)
+      .clusterizedPlacemarkCollection
+    {
+      { point, image, style in
+        let placemark = collection.addPlacemark()
+        placemark.geometry = point
+        placemark.setIconWith(image, style: style)
+
+        return placemark
+      }
+    } else {
+      { point, image, style in
+        let placemark = uiView.mapWindow.map.mapObjects.addPlacemark()
+        placemark.geometry = point
+        placemark.setIconWith(image, style: style)
+
+        return placemark
+      }
+    }
 
     let placemarkRemover: PlacemarkRemover = context
       .coordinator
@@ -346,7 +380,7 @@ extension YandexMap {
   }
 }
 
-// MARK: - Coordinator.
+// MARK: - Coordinator
 
 public extension YandexMap {
   class Coordinator: NSObject,
@@ -384,13 +418,15 @@ public extension YandexMap {
     }
 
     public func onObjectAdded(with view: YMKUserLocationView) {
-      let image: UIImage
-      if let path = Bundle.module.path(forResource: "circle", ofType: "png"),
-         let uiImage = UIImage(contentsOfFile: path)
+      let image: UIImage = if let path = Bundle.main.path(
+        forResource: "circle",
+        ofType: "png"
+      ),
+        let uiImage = UIImage(contentsOfFile: path)
       {
-        image = uiImage
+        uiImage
       } else {
-        image = UIImage(
+        UIImage(
           systemName: "circle.inset.filled"
         )!
       }
@@ -523,24 +559,24 @@ public extension YandexMap {
   }
 }
 
-// MARK: - CollectionDifference.Change.
+// MARK: - CollectionDifference.Change
 
 private extension CollectionDifference.Change {
   var element: ChangeElement {
     switch self {
     case let .insert(_, element, _):
-      return element
+      element
     case let .remove(_, element, _):
-      return element
+      element
     }
   }
 
   var offset: Int {
     switch self {
     case let .insert(offset, _, _):
-      return offset
+      offset
     case let .remove(offset, _, _):
-      return offset
+      offset
     }
   }
 }
